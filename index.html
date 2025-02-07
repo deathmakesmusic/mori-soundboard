@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mori Soundboard</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --primary: #f2677c;   /* Pink – most important */
+      --secondary: #b5063e;
+      --dark: #3e363b;
+      --accent: #b88965;
+      --light: #ffc6dd;
+    }
+    /* Pulse animation to indicate a playing sound */
+    .playing {
+      animation: pulse 1s infinite;
+      border: 2px solid var(--primary);
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 5px var(--primary); }
+      50% { box-shadow: 0 0 15px var(--primary); }
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <!-- Header -->
+  <header class="p-4 bg-white shadow">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+      <h1 class="text-2xl font-bold text-gray-900 mb-2 md:mb-0">Mori Soundboard</h1>
+      <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
+        <div class="relative w-full max-w-xl mx-auto">
+          <input type="text" id="searchInput" placeholder="Search sounds…" class="w-full border border-gray-300 rounded-full py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-pink-400" />
+          <button id="clearSearch" title="Clear search field" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xl text-gray-500 hidden">×</button>
+          <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m1.55-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <div class="flex items-center space-x-2 mt-2 md:mt-0 whitespace-nowrap">
+          <span class="font-medium whitespace-nowrap">Multi-Play</span>
+          <label title="Toggle multi-play: allow overlapping sounds when on" class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="overlapToggle" class="sr-only peer" />
+            <div class="w-11 h-6 bg-gray-200 rounded-full peer-focus:ring-2 peer-focus:ring-pink-400 dark:bg-gray-700 peer-checked:bg-pink-500"></div>
+            <span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-200 transform peer-checked:translate-x-5"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sound grid: grid-auto-rows ensures all items in a row have equal height -->
+  <main id="soundGrid" class="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4" style="grid-auto-rows: 1fr;"></main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput   = document.getElementById('searchInput');
+      const clearSearch   = document.getElementById('clearSearch');
+      const soundGrid     = document.getElementById('soundGrid');
+      const overlapToggle = document.getElementById('overlapToggle');
+      let sounds = [];
+      let playingAudios = [];
+
+      // Helper: derive display name (use sound.name if provided; otherwise, derive from file)
+      function getDisplayName(sound) {
+        let displayName = sound.name;
+        if (!displayName || displayName.trim() === "") {
+          displayName = sound.file.replace(/\.[^/.]+$/, "").replace(/-/g, " ");
+        }
+        return displayName.trim();
+      }
+
+      // Set multi-play toggle (default true)
+      const storedOverlap = localStorage.getItem('allowOverlap');
+      overlapToggle.checked = storedOverlap === 'false' ? false : true;
+      overlapToggle.addEventListener('change', () => {
+        localStorage.setItem('allowOverlap', overlapToggle.checked);
+        if (!overlapToggle.checked) stopAllSounds();
+      });
+
+      // Load search query from URL if present
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('q')) {
+        searchInput.value = params.get('q');
+        clearSearch.classList.remove('hidden');
+      }
+
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+        updateURLQuery(query);
+        applySearchFilter(query);
+        clearSearch.classList.toggle('hidden', query === '');
+      });
+
+      clearSearch.addEventListener('click', () => {
+        searchInput.value = '';
+        updateURLQuery('');
+        applySearchFilter('');
+        clearSearch.classList.add('hidden');
+      });
+
+      // Load sounds from JSON file.
+      // This approach removes trailing commas from the JSON before parsing.
+      fetch('sounds.json')
+        .then(response => response.text())
+        .then(text => {
+          // Remove trailing commas from objects and arrays.
+          text = text.replace(/,\s*(\]|\})/g, '$1');
+          return JSON.parse(text);
+        })
+        .then(data => {
+          sounds = data;
+          renderSounds();
+          const q = searchInput.value.trim();
+          if (q) applySearchFilter(q);
+        })
+        .catch(err => console.error('Error loading sounds:', err));
+
+      function renderSounds() {
+        soundGrid.innerHTML = '';
+        const pinned = [], unpinned = [];
+        // Group sounds by pinned status.
+        sounds.forEach(sound => {
+          const pinKey = 'pin_' + sound.file;
+          (localStorage.getItem(pinKey) === 'true' ? pinned : unpinned).push(sound);
+        });
+        // Sort each group alphabetically by display name.
+        const compareSounds = (a, b) => {
+          const aName = getDisplayName(a).toLowerCase();
+          const bName = getDisplayName(b).toLowerCase();
+          return aName < bName ? -1 : aName > bName ? 1 : 0;
+        };
+        pinned.sort(compareSounds);
+        unpinned.sort(compareSounds);
+        const sorted = [...pinned, ...unpinned];
+
+        sorted.forEach(sound => {
+          const displayName = getDisplayName(sound);
+          const card = document.createElement('div');
+          card.className = "relative bg-white border border-gray-200 rounded-lg shadow p-4 cursor-pointer hover:shadow-lg transition flex flex-col justify-center";
+          card.dataset.name = displayName.toLowerCase();
+          card.dataset.tags = (sound.tags || []).join(' ').toLowerCase();
+          card.dataset.file = sound.file;
+
+          // Footer container: holds the text and star in one horizontal line.
+          const footer = document.createElement('div');
+          footer.className = "w-full flex items-center justify-between";
+
+          const nameEl = document.createElement('span');
+          nameEl.className = "sound-name font-semibold break-words flex-1 min-w-0";
+          nameEl.textContent = displayName;
+          footer.appendChild(nameEl);
+
+          const pinBtn = document.createElement('button');
+          pinBtn.className = "ml-2 flex-shrink-0";
+          const isPinned = localStorage.getItem('pin_' + sound.file) === 'true';
+          pinBtn.innerHTML = getPinSVG(isPinned);
+          pinBtn.title = isPinned ? "Unpin sound" : "Pin sound";
+          pinBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            togglePin(sound.file, pinBtn);
+          });
+          footer.appendChild(pinBtn);
+
+          card.appendChild(footer);
+          card.addEventListener('click', () => playSound(sound, card, nameEl));
+          soundGrid.appendChild(card);
+
+          adjustTextSize(nameEl);
+        });
+      }
+
+      function togglePin(filename, pinBtn) {
+        const key = 'pin_' + filename;
+        let isPinned = localStorage.getItem(key) === 'true';
+        if (isPinned) {
+          localStorage.removeItem(key);
+        } else {
+          localStorage.setItem(key, 'true');
+        }
+        isPinned = localStorage.getItem(key) === 'true';
+        pinBtn.innerHTML = getPinSVG(isPinned);
+        pinBtn.title = isPinned ? "Unpin sound" : "Pin sound";
+        renderSounds();
+        const query = searchInput.value.trim();
+        if (query) applySearchFilter(query);
+      }
+
+      function getPinSVG(isPinned) {
+        return `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ${isPinned ? 'text-pink-500' : 'text-gray-400'}" viewBox="0 0 24 24" fill="${isPinned ? 'currentColor' : 'none'}" stroke="${isPinned ? 'none' : 'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                </svg>`;
+      }
+
+      function adjustTextSize(el) {
+        const oldWS = el.style.whiteSpace;
+        el.style.whiteSpace = 'nowrap';
+        let style = window.getComputedStyle(el);
+        let fontSize = parseFloat(style.fontSize);
+        const parentWidth = el.parentNode.clientWidth;
+        while (el.scrollWidth > parentWidth && fontSize > 10) {
+          fontSize -= 1;
+          el.style.fontSize = fontSize + 'px';
+        }
+        el.style.whiteSpace = oldWS || 'normal';
+      }
+
+      function playSound(sound, card, nameEl) {
+        if (!overlapToggle.checked) stopAllSounds();
+        const audio = new Audio("sounds/" + sound.file);
+        card.playingCount = (card.playingCount || 0) + 1;
+        card.classList.add('playing');
+        audio.play().catch(() => {
+          audio.dispatchEvent(new Event('error'));
+        });
+        audio.addEventListener('ended', () => {
+          card.playingCount--;
+          if (card.playingCount <= 0) {
+            card.classList.remove('playing');
+            card.playingCount = 0;
+          }
+        });
+        audio.addEventListener('error', () => {
+          card.playingCount--;
+          if (card.playingCount <= 0) {
+            card.classList.remove('playing');
+            card.playingCount = 0;
+          }
+        });
+        playingAudios.push(audio);
+      }
+
+      function stopAllSounds() {
+        playingAudios.forEach(audio => {
+          audio.pause();
+          audio.currentTime = 0;
+        });
+        playingAudios = [];
+        document.querySelectorAll('.playing').forEach(card => {
+          card.classList.remove('playing');
+          card.playingCount = 0;
+        });
+      }
+
+      function updateURLQuery(query) {
+        const newURL = query ? ('?q=' + encodeURIComponent(query)) : window.location.pathname;
+        window.history.pushState({ path: newURL }, '', newURL);
+      }
+
+      function applySearchFilter(query) {
+        const tokens = parseQuery(query);
+        document.querySelectorAll('#soundGrid > div').forEach(card => {
+          const name = card.dataset.name;
+          const tags = card.dataset.tags;
+          if (tokens.length === 0) {
+            card.classList.remove('hidden');
+            return;
+          }
+          const matches = tokens.some(token => name.includes(token) || tags.includes(token));
+          card.classList.toggle('hidden', !matches);
+        });
+      }
+
+      function parseQuery(query) {
+        const numQuotes = (query.match(/"/g) || []).length;
+        if (numQuotes % 2 === 1) {
+          return query.replace(/[^\w\s]/g, ' ').split(/\s+/).filter(token => token.length);
+        } else {
+          const tokens = [];
+          const regex = /"([^"]+)"|(\S+)/g;
+          let match;
+          while ((match = regex.exec(query)) !== null) {
+            tokens.push((match[1] || match[2]).toLowerCase());
+          }
+          return tokens;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
