@@ -7,6 +7,10 @@
         "file": "oh-let-me-see-those-balls.mp3",
     },
     {
+        "file": "mina-san.mp3",
+        "name": "mina-san",
+    },
+    {
         "file": "take-a-little-sniff.mp3",
         "tags": ["a little whiff"]
     },
