@@ -24,8 +24,12 @@
         "name": "I'm thinkin' kino"
     },
     {
-        "file": "im-pregnant.ogg",
+        "file": "im-pregnant.mp3",
         "name": "I'm pregnant"
+    },
+    {
+        "file": "gobble.mp3",
+        "name": "(gobble)"
     },
     {
         "file": "fuck-shit-holy-shit-goddammit-son-of-a-bitch.mp3",
