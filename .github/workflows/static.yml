@@ -35,49 +35,47 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install JSON5 dependency
+        run: npm install json5
+
       - name: Update sounds.json from sounds directory
         run: |
           node -e "
             const fs = require('fs');
             const path = require('path');
+            const JSON5 = require('json5');
             const soundsDir = path.join(process.cwd(), 'sounds');
             const jsonFile = path.join(process.cwd(), 'sounds.json');
             let sounds = [];
             if (fs.existsSync(jsonFile)) {
               try {
-                let content = fs.readFileSync(jsonFile, 'utf8');
-                // Repeatedly remove trailing commas until stable.
-                let cleaned;
-                do {
-                  cleaned = content.replace(/,\s*([\]}])/g, '$1');
-                  if (cleaned === content) break;
-                  content = cleaned;
-                } while (true);
-                sounds = JSON.parse(cleaned);
+                // Use JSON5 to parse non‑standard JSON (e.g. with trailing commas)
+                const content = fs.readFileSync(jsonFile, 'utf8');
+                sounds = JSON5.parse(content);
               } catch (err) {
                 console.error('Error parsing sounds.json:', err);
                 sounds = [];
               }
             }
-            // Build a map of existing entries keyed by file name.
+            // Build a map of existing entries (keyed by the file property)
             const existing = new Map();
             sounds.forEach(entry => {
               if (entry.file) {
                 existing.set(entry.file, entry);
               }
             });
-            // List all files in the sounds directory.
+            // List all files in the sounds directory
             const files = fs.readdirSync(soundsDir).filter(f => {
               return fs.statSync(path.join(soundsDir, f)).isFile();
             });
-            // For each file not already in sounds.json, add a new entry.
+            // For each file not already present, add a new entry with a default name and empty tags array.
             files.forEach(file => {
               if (!existing.has(file)) {
                 const name = file.replace(/\.[^/.]+$/, '').replace(/-/g, ' ');
                 sounds.push({ name: name, file: file, tags: [] });
               }
             });
-            // Write back the (merged) sounds.json file.
+            // Write the merged data back as standard JSON.
             fs.writeFileSync(jsonFile, JSON.stringify(sounds, null, 2));
           "
       - name: Commit updated sounds.json if changed
