@@ -45,33 +45,39 @@ jobs:
             let sounds = [];
             if (fs.existsSync(jsonFile)) {
               try {
-                // Read and sanitize sounds.json by removing trailing commas
-                const content = fs.readFileSync(jsonFile, 'utf8');
-                const cleaned = content.replace(/,\s*(\]|\})/g, '$1');
+                let content = fs.readFileSync(jsonFile, 'utf8');
+                // Repeatedly remove trailing commas until stable.
+                let cleaned;
+                do {
+                  cleaned = content.replace(/,\s*([\]}])/g, '$1');
+                  if (cleaned === content) break;
+                  content = cleaned;
+                } while (true);
                 sounds = JSON.parse(cleaned);
               } catch (err) {
                 console.error('Error parsing sounds.json:', err);
                 sounds = [];
               }
             }
-            // Build a map of existing entries keyed by file name
+            // Build a map of existing entries keyed by file name.
             const existing = new Map();
             sounds.forEach(entry => {
-              if (entry.file) existing.set(entry.file, entry);
+              if (entry.file) {
+                existing.set(entry.file, entry);
+              }
             });
-            // List files in the sounds directory
+            // List all files in the sounds directory.
             const files = fs.readdirSync(soundsDir).filter(f => {
               return fs.statSync(path.join(soundsDir, f)).isFile();
             });
-            // For each file, if not already in sounds.json, add a new entry.
-            // The default name is derived by stripping the extension and replacing dashes with spaces.
+            // For each file not already in sounds.json, add a new entry.
             files.forEach(file => {
               if (!existing.has(file)) {
                 const name = file.replace(/\.[^/.]+$/, '').replace(/-/g, ' ');
                 sounds.push({ name: name, file: file, tags: [] });
               }
             });
-            // Write back the merged sounds.json
+            // Write back the (merged) sounds.json file.
             fs.writeFileSync(jsonFile, JSON.stringify(sounds, null, 2));
           "
       - name: Commit updated sounds.json if changed
