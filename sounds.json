@@ -1,162 +1,116 @@
 [
-  {
-    "name": "ara ara bitch",
-    "file": "ara-ara-bitch.mp3",
-    "tags": []
-  },
-  {
-    "name": "ara ara",
-    "file": "ara-ara.mp3",
-    "tags": []
-  },
-  {
-    "name": "bitch",
-    "file": "bitch.mp3",
-    "tags": []
-  },
-  {
-    "name": "cobblin deez nuts",
-    "file": "cobblin-deez-nuts.mp3",
-    "tags": []
-  },
-  {
-    "name": "do ass cheeks clap",
-    "file": "do-ass-cheeks-clap.mp3",
-    "tags": []
-  },
-  {
-    "name": "dont believe those narratives",
-    "file": "dont-believe-those-narratives.mp3",
-    "tags": []
-  },
-  {
-    "name": "fuck my life man",
-    "file": "fuck-my-life-man.mp3",
-    "tags": []
-  },
-  {
-    "name": "fuck shit holy shit goddammit son of a bitch",
-    "file": "fuck-shit-holy-shit-goddammit-son-of-a-bitch.mp3",
-    "tags": []
-  },
-  {
-    "name": "gobble",
-    "file": "gobble.mp3",
-    "tags": []
-  },
-  {
-    "name": "guh",
-    "file": "guh.mp3",
-    "tags": []
-  },
-  {
-    "name": "hey guys two quick questions",
-    "file": "hey-guys-two-quick-questions.opus",
-    "tags": []
-  },
-  {
-    "name": "i love league",
-    "file": "i-love-league.mp3",
-    "tags": []
-  },
-  {
-    "name": "if you die in the game you die in real life",
-    "file": "if-you-die-in-the-game-you-die-in-real-life.mp3",
-    "tags": []
-  },
-  {
-    "name": "im good",
-    "file": "im-good.mp3",
-    "tags": []
-  },
-  {
-    "name": "im not a pervert",
-    "file": "im-not-a-pervert.mp3",
-    "tags": []
-  },
-  {
-    "name": "im not like the other holos",
-    "file": "im-not-like-the-other-holos.mp3",
-    "tags": []
-  },
-  {
-    "name": "im pregnant",
-    "file": "im-pregnant.mp3",
-    "tags": []
-  },
-  {
-    "name": "im thinkin kino",
-    "file": "im-thinkin-kino.ogg",
-    "tags": []
-  },
-  {
-    "name": "just kidding go fuck yourself",
-    "file": "just-kidding-go-fuck-yourself.mp3",
-    "tags": []
-  },
-  {
-    "name": "mina san",
-    "file": "mina-san.mp3",
-    "tags": []
-  },
-  {
-    "name": "moe moe kyun",
-    "file": "moe-moe-kyun.mp3",
-    "tags": []
-  },
-  {
-    "name": "oh let me see those balls",
-    "file": "oh-let-me-see-those-balls.mp3",
-    "tags": []
-  },
-  {
-    "name": "ok fine",
-    "file": "ok-fine.mp3",
-    "tags": []
-  },
-  {
-    "name": "oppai is boobies",
-    "file": "oppai-is-boobies.mp3",
-    "tags": []
-  },
-  {
-    "name": "prrroinks for the prrroink god",
-    "file": "prrroinks-for-the-prrroink-god.mp3",
-    "tags": []
-  },
-  {
-    "name": "roblox oof",
-    "file": "roblox-oof.mp3",
-    "tags": []
-  },
-  {
-    "name": "shut up laughing",
-    "file": "shut-up-laughing.mp3",
-    "tags": []
-  },
-  {
-    "name": "take a little sniff",
-    "file": "take-a-little-sniff.mp3",
-    "tags": []
-  },
-  {
-    "name": "tom scream",
-    "file": "tom-scream.mp3",
-    "tags": []
-  },
-  {
-    "name": "what the fuck angry",
-    "file": "what-the-fuck-angry.mp3",
-    "tags": []
-  },
-  {
-    "name": "why not both",
-    "file": "why-not-both.mp3",
-    "tags": []
-  },
-  {
-    "name": "youre never gonna become japanese",
-    "file": "youre-never-gonna-become-japanese.mp3",
-    "tags": []
-  }
+    {
+        "file": "prrroinks-for-the-prrroink-god.mp3",
+        "tags": ["proink"]
+    },
+    {
+        "file": "oh-let-me-see-those-balls.mp3",
+    },
+    {
+        "file": "mina-san.mp3",
+        "name": "mina-san",
+    },
+    {
+        "file": "take-a-little-sniff.mp3",
+        "tags": ["a little whiff"]
+    },
+    {
+        "file": "if-you-die-in-the-game-you-die-in-real-life.mp3",
+    },
+    {
+        "file": "oppai-is-boobies.mp3",
+    },
+    {
+        "file": "fuck-my-life-man.mp3",
+        "name": "fuck my life, man"
+    },
+    {
+        "file": "tom-scream.mp3",
+        "name": "(Tom scream)"
+    },
+    {
+        "file": "shut-up-laughing.mp3",
+        "name": "shut up (laughing)"
+    },
+    {
+        "file": "what-the-fuck-angry.mp3",
+        "name": "what the fuck (angry)"
+    },
+    {
+        "file": "just-kidding-go-fuck-yourself.mp3",
+    },
+    {
+        "file": "do-ass-cheeks-clap.mp3",
+    },
+    {
+        "file": "roblox-oof.mp3",
+    },
+    {
+        "file": "ara-ara.mp3",
+    },
+    {
+        "file": "i-love-league.mp3",
+        "name": "I love League",
+    },
+    {
+        "file": "im-not-a-pervert.mp3",
+        "name": "I'm not a pervert",
+    },
+    {
+        "file": "dont-believe-those-narratives.mp3",
+        "name": "don't believe those narratives"
+    },
+    {
+        "file": "ara-ara-bitch.mp3",
+    },
+    {
+        "file": "ok-fine.mp3",
+    },
+    {
+        "file": "cobblin-deez-nuts.mp3",
+    },
+    {
+        "file": "moe-moe-kyun.mp3",
+    },
+    {
+        "file": "bitch.mp3",
+    },
+    {
+        "file": "guh.mp3",
+    },
+    {
+        "file": "hey-guys-two-quick-questions.opus",
+    },
+    {
+        "file": "im-thinkin-kino.ogg",
+        "name": "I'm thinkin' kino"
+    },
+    {
+        "file": "im-pregnant.mp3",
+        "name": "I'm pregnant"
+    },
+    {
+        "file": "gobble.mp3",
+        "name": "(gobble)"
+    },
+    {
+        "file": "fuck-shit-holy-shit-goddammit-son-of-a-bitch.mp3",
+    },
+    {
+        "file": "why-not-both.mp3",
+        "tags": ["both are good"],
+    },
+    {
+        "name": "I'm good",
+        "file": "im-good.mp3",
+    },
+    {
+        "name": "you're never gonna become Japanese",
+        "file": "youre-never-gonna-become-japanese.mp3",
+    },
+    {
+        "name": "I'm not like the other holos",
+        "file": "im-not-like-the-other-holos.mp3",
+        "tags": ["i'm worse", "you'll see", "they all do"]
+    },
 ]
